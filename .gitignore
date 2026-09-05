@@ -1,0 +1,93 @@
+# =========================
+# Maven
+# =========================
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+
+# =========================
+# IntelliJ IDEA
+# =========================
+.idea/
+*.iws
+*.iml
+*.ipr
+
+
+# =========================
+# Eclipse / STS (if used)
+# =========================
+.classpath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+
+# =========================
+# Java
+# =========================
+*.class
+*.log
+hs_err_pid*
+replay_pid*
+
+
+# =========================
+# OS
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+
+# =========================
+# Spring Boot / Environment
+# =========================
+.env
+.env.*
+!.env.example
+
+
+# =========================
+# Application configuration
+# =========================
+application-local.properties
+application-local.yml
+application-local.yaml
+
+application-dev.properties
+application-dev.yml
+application-dev.yaml
+
+
+# =========================
+# Logs
+# =========================
+logs/
+*.log
+
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+
+# =========================
+# Coverage / Testing
+# =========================
+coverage/
+jacoco.exec
