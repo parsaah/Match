@@ -1,62 +1,123 @@
 package org.example.match.user.service;
 
+import org.example.match.user.dto.AdminUserUpdateRequest;
+import org.example.match.user.dto.UserCreateRequest;
+import org.example.match.user.dto.UserUpdateRequest;
 import org.example.match.user.entity.User;
 import org.example.match.user.enums.UserRole;
 import org.example.match.user.exception.EmailAlreadyExistsException;
 import org.example.match.user.exception.UserNotFoundException;
 import org.example.match.user.exception.UsernameAlreadyExistsException;
+import org.example.match.user.mapper.UserMapper;
 import org.example.match.user.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class UserService {
 
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
-    public UserService(UserRepository userRepository){
+    public UserService(
+            UserRepository userRepository,
+            UserMapper userMapper) {
+
         this.userRepository = userRepository;
+        this.userMapper = userMapper;
     }
 
-    // Create
-    public User createUser(User user) {
+    public User createUser(UserCreateRequest request) {
 
-        if (userRepository.existsByUsername(user.getUsername())) {
-            throw new UsernameAlreadyExistsException(user.getUsername());
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new UsernameAlreadyExistsException(
+                    request.getUsername()
+            );
         }
 
-        if (userRepository.existsByEmail(user.getEmail())) {
-            throw new EmailAlreadyExistsException(user.getEmail());
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new EmailAlreadyExistsException(
+                    request.getEmail()
+            );
         }
+
+        User user = userMapper.toEntity(request);
 
         return userRepository.save(user);
     }
 
-    // Read - All
-    public List<User> getAllUsers() {
-        return userRepository.findAll();
+    public User updateUser(
+            UUID id,
+            UserUpdateRequest request) {
+
+        User existingUser = getUserById(id);
+
+        if (!existingUser.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+
+            throw new EmailAlreadyExistsException(
+                    request.getEmail()
+            );
+        }
+
+        userMapper.updateEntity(request, existingUser);
+
+        return userRepository.save(existingUser);
     }
 
-    // Read - By ID
-    public User getUserById(Long id) {
+    public User updateUserByAdmin(
+            UUID id,
+            AdminUserUpdateRequest request) {
+
+        User existingUser = getUserById(id);
+
+        if (!existingUser.getUsername().equals(request.getUsername())
+                && userRepository.existsByUsername(request.getUsername())) {
+
+            throw new UsernameAlreadyExistsException(
+                    request.getUsername()
+            );
+        }
+
+        if (!existingUser.getEmail().equals(request.getEmail())
+                && userRepository.existsByEmail(request.getEmail())) {
+
+            throw new EmailAlreadyExistsException(
+                    request.getEmail()
+            );
+        }
+
+        userMapper.updateEntityByAdmin(
+                request,
+                existingUser
+        );
+
+        return userRepository.save(existingUser);
+    }
+
+    public User getUserById(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with id: " + id));
+                .orElseThrow(() ->
+                        new UserNotFoundException(id)
+                );
+    }
+
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     // Read - By Username
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with username: " + username));
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     // Read - By Email
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException(
-                        "User not found with email: " + email));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     // Read - By Role
@@ -64,51 +125,10 @@ public class UserService {
         return userRepository.findByRole(role);
     }
 
-    // Update
-    public User updateUser(Long id, User user) {
-
-        User existingUser = getUserById(id);
-
-        // username تغییر کرده؟
-        if (!existingUser.getUsername().equals(user.getUsername())) {
-
-            if (userRepository.existsByUsername(user.getUsername())) {
-                throw new UsernameAlreadyExistsException(
-                        user.getUsername()
-                );
-            }
-
-            existingUser.setUsername(user.getUsername());
-        }
-
-        // email تغییر کرده؟
-        if (!existingUser.getEmail().equals(user.getEmail())) {
-
-            if (userRepository.existsByEmail(user.getEmail())) {
-                throw new EmailAlreadyExistsException(
-                        user.getEmail()
-                );
-            }
-
-            existingUser.setEmail(user.getEmail());
-        }
-
-//        existingUser.setUsername(user.getUsername());
-        existingUser.setFirstName(user.getFirstName());
-        existingUser.setLastName(user.getLastName());
-        existingUser.setRole(user.getRole());
-        existingUser.setStatus(user.getStatus());
-        existingUser.setAge(user.getAge());
-        existingUser.setPhoneNumber(user.getPhoneNumber());
-//        existingUser.setEmail(user.getEmail());
-
-        return userRepository.save(existingUser);
-    }
-
-    // Delete
-    public void deleteUser(Long id) {
+    public void deleteUser(UUID id) {
 
         User user = getUserById(id);
+
         userRepository.delete(user);
     }
 }

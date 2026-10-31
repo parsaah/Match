@@ -4,10 +4,11 @@ import org.example.match.user.enums.UserRole;
 import org.example.match.user.enums.UserStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public class UserResponse {
 
-    private Long id;
+    private UUID id;
     private String username;
     private String firstName;
     private String lastName;
@@ -21,11 +22,11 @@ public class UserResponse {
 
     //Getter & Setter
 
-    public Long getId() {
+    public UUID getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(UUID id) {
         this.id = id;
     }
 
