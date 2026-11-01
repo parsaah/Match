@@ -11,6 +11,12 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
+import org.springframework.security.oauth2.core.OAuth2TokenValidatorResult;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import java.util.Base64;
@@ -48,16 +54,55 @@ public class JwtConfig {
         );
     }
 
+//    @Bean
+//    public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
+//
+//        NimbusJwtDecoder decoder = NimbusJwtDecoder
+//                .withSecretKey(jwtSecretKey)
+//                .macAlgorithm(MacAlgorithm.HS256)
+//                .build();
+//
+//        decoder.setJwtValidator(
+//                JwtValidators.createDefaultWithIssuer("community-platform")
+//        );
+//
+//        return decoder;
+//    }
+
     @Bean
-    public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
+    public JwtDecoder jwtDecoder(
+            SecretKey secretKey,
+            JwtDenylistService denylistService) {
 
         NimbusJwtDecoder decoder = NimbusJwtDecoder
-                .withSecretKey(jwtSecretKey)
+                .withSecretKey(secretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
 
+        OAuth2TokenValidator<Jwt> issuerValidator =
+                JwtValidators.createDefaultWithIssuer(
+                        "community-platform"
+                );
+
+        OAuth2TokenValidator<Jwt> denylistValidator = jwt -> {
+            if (denylistService.isRevoked(jwt)) {
+                OAuth2Error error = new OAuth2Error(
+                        "invalid_token",
+                        "Access token has been revoked",
+                        null
+                );
+
+                return OAuth2TokenValidatorResult.failure(error);
+            }
+
+            return OAuth2TokenValidatorResult.success();
+        };
+
         decoder.setJwtValidator(
-                JwtValidators.createDefaultWithIssuer("community-platform")
+                new DelegatingOAuth2TokenValidator<>(
+                        issuerValidator,
+                        denylistValidator
+                )
         );
 
         return decoder;

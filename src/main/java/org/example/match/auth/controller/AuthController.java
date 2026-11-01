@@ -11,6 +11,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -52,9 +54,23 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(
+            @RequestHeader(
+                    value = HttpHeaders.AUTHORIZATION
+//                    required = false
+            ) String authorization,
             @Valid @RequestBody RefreshTokenRequest request) {
 
-        authService.logout(request);
+        String accessToken = null;
+
+        if (authorization != null
+                && authorization.startsWith("Bearer ")) {
+            accessToken = authorization.substring(7);
+        }
+
+        authService.logout(
+                request.refreshToken(),
+                accessToken
+        );
 
         return ResponseEntity.noContent().build();
     }
