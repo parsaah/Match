@@ -1,5 +1,6 @@
-package org.example.match.auth.refresh;
+package org.example.match.auth.repository;
 
+import org.example.match.auth.entity.RefreshToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;

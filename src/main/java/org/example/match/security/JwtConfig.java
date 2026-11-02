@@ -54,21 +54,6 @@ public class JwtConfig {
         );
     }
 
-//    @Bean
-//    public JwtDecoder jwtDecoder(SecretKey jwtSecretKey) {
-//
-//        NimbusJwtDecoder decoder = NimbusJwtDecoder
-//                .withSecretKey(jwtSecretKey)
-//                .macAlgorithm(MacAlgorithm.HS256)
-//                .build();
-//
-//        decoder.setJwtValidator(
-//                JwtValidators.createDefaultWithIssuer("community-platform")
-//        );
-//
-//        return decoder;
-//    }
-
     @Bean
     public JwtDecoder jwtDecoder(
             SecretKey secretKey,

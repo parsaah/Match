@@ -1,4 +1,4 @@
-package org.example.match.auth.refresh;
+package org.example.match.auth.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

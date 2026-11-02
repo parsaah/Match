@@ -56,7 +56,6 @@ public class AuthController {
     public ResponseEntity<Void> logout(
             @RequestHeader(
                     value = HttpHeaders.AUTHORIZATION
-//                    required = false
             ) String authorization,
             @Valid @RequestBody RefreshTokenRequest request) {
 

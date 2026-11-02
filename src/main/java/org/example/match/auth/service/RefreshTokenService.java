@@ -1,8 +1,8 @@
 package org.example.match.auth.service;
 
 import org.example.match.auth.exception.InvalidRefreshTokenException;
-import org.example.match.auth.refresh.RefreshToken;
-import org.example.match.auth.refresh.RefreshTokenRepository;
+import org.example.match.auth.entity.RefreshToken;
+import org.example.match.auth.repository.RefreshTokenRepository;
 
 import org.example.match.user.entity.User;
 import org.example.match.user.enums.UserStatus;
